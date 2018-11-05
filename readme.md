@@ -23,4 +23,5 @@ L'aide à l'achat :
 # CI TESTS - Test d'intégration continue (type blackbox)
 
 API doc : https://documenter.getpostman.com/view/1954123/6YyTZxL
+
 Tests collection : tests/ci_tests_postman.json
