@@ -18,3 +18,8 @@ L'aide à l'achat :
 - Note "le degré d'affinité" que vous avez au livre en fonction de votre bibliothèque déjà renseignée 
 - Sur la page du livre un lien pour l'achat via une plateforme spécialisée (Amazon, Fnac...) 
 - Peut-être : géolocalisation avec librairies partenaires pour savoir si le livre est en stock
+
+
+# CI TESTS - Test d'intégration continue (type blackbox)
+
+https://documenter.getpostman.com/view/1954123/6YyTZxL
