@@ -1,0 +1,6887 @@
+{
+	"info": {
+		"_postman_id": "5717558d-168c-ce0b-7b46-7b086d764398",
+		"name": "BookShelf - BlackBox Testing - Functionnal tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Register - Add new valid user [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ce2b6ec4-9bc8-420f-9cc1-c5ca3467b62e",
+						"type": "text/javascript",
+						"exec": [
+							"var newUserName = Math.random().toString(36).substr(2, 15);",
+							"var newUserPassword = Math.random().toString(36).substr(2, 15);",
+							"var newUserMail = Math.random().toString(36).substr(2, 15) + \"@gmail.com\";",
+							"",
+							"postman.setEnvironmentVariable('generated_email_auth', newUserMail);",
+							"postman.setEnvironmentVariable('generated_password_auth', newUserPassword);",
+							"postman.setEnvironmentVariable('generated_username_auth', newUserName);"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "1921120d-80da-4d9a-bef9-07f2eabb26f6",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var newUserMail = json.data.email;",
+							"            var newUserName = json.data.name;",
+							"            ",
+							"            if (newUserMail !== undefined && newUserMail !== null && newUserName !== undefined && newUserName !== null)",
+							"            {",
+							"                tests['Returned credentials.'] = true;",
+							"                if (newUserMail === environment.generated_email_auth && newUserName === environment.generated_username_auth)",
+							"                {",
+							"                    tests['Returned credentials matching with registration.'] = true;",
+							"                }",
+							"                else",
+							"                {",
+							"                    tests['Returned credentials does not matching with registration'] = false;",
+							"                }",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Returned credentials.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "{{generated_email_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "{{generated_username_auth}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/register",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"register"
+					]
+				},
+				"description": "Trying to add a new user with valid credentials"
+			},
+			"response": []
+		},
+		{
+			"name": "Register - Add new wrong user [email + name + password]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var newUserName = 'T';",
+							"var newUserPassword = Math.random().toString(5).substring(2) + 'ziejijzefjziefjij';",
+							"var newUserMail = Math.random().toString(36).substring(7);",
+							"",
+							"",
+							"postman.setEnvironmentVariable('generated_wrong_email_auth', newUserMail);",
+							"postman.setEnvironmentVariable('generated_wrong_password_auth', newUserPassword);",
+							"postman.setEnvironmentVariable('generated_wrong_username_auth', newUserName);"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found.'] = true;",
+							"        if (json.errors !== null && json.errors !== undefined && (json.data === null || json.data === undefined))",
+							"        {",
+							"            if (json.errors.email !== undefined && json.errors.email !== null &&",
+							"                json.errors.password !== undefined && json.errors.password !== null &&",
+							"                json.errors.name !== undefined && json.errors.name !== null)",
+							"            {",
+							"                tests['Email && password && name are not well formatted. || Validation errors'] = true;    ",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Email && password && name are well formatted.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "{{generated_wrong_email_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{generated_wrong_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "{{generated_wrong_username_auth}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/register",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"register"
+					]
+				},
+				"description": "Try to add a new user with bad formatted credentials : email, password and name"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth - Connect valid user [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d9091ab2-29b6-4848-b942-9d7e34ea0bfd",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var token = json.data.token;",
+							"            var userID = json.data.user_id;",
+							"            if (token !== null && token !== undefined)",
+							"            {",
+							"                postman.setEnvironmentVariable(\"token\", token);",
+							"                postman.setEnvironmentVariable('generated_user_id', userID);",
+							"                tests[\"Token is valid\"] = token !== null;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Token is not valid'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "{{generated_email_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/auth",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"auth"
+					]
+				},
+				"description": "Connect to the api with previous valid registration credentials\nExpect as result : \n  - token"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth - Connect wrong user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null && json.errors !== undefined)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        if (json.errors !== null && json.errors !== undefined)",
+							"        {",
+							"            if (json.errors.email !== null && json.errors.email !== undefined)",
+							"            {",
+							"                tests[\"Email is bad.\"] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Email has passed.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any errors'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "{{generated_wrong_email_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{generated_wrong_password_auth}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/auth",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"auth"
+					]
+				},
+				"description": "Connect to the api with previous wrong registration credentials\nExpect as result : \n  - errors"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth - Connect valid user - Bad password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null && json.errors !== undefined)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        if (json.errors !== null && json.errors !== undefined)",
+							"        {",
+							"            var subStringCredentialMatch = \"not valid\";",
+							"            ",
+							"            if (json.title !== null && json.title !== null && json.title.indexOf(subStringCredentialMatch) != -1)",
+							"            {",
+							"                tests[\"Bad credentials.\"] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Credentials are good.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any errors'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "{{generated_email_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{generated_wrong_password_auth}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/auth",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"auth"
+					]
+				},
+				"description": "Connect to the api with previous valid registration credentials except password field is wrong\nExpect as result : \n  - errors => Bad credentials"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Get data [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var data = json.data;",
+							"        if (data !== undefined && data !== null)",
+							"        {",
+							"            tests['Data is not null'] = true;",
+							"            if (data.books !== undefined && data.books !== null &&",
+							"                data.profile !== undefined && data.profile !== null)",
+							"            {",
+							"                tests['Books and profile information has been received.'] = true;       ",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Books OR profile information missing.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Data is null.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile"
+					]
+				},
+				"description": "Get data from user's profile"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Change password [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable('profile_tmp_change_password', 'TotoIsNewPassword');",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.data !== undefined && json.data !== null && (json.errors === null || json.errors === undefined))",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        postman.setEnvironmentVariable('generated_password_auth', environment.profile_tmp_change_password);",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "new_password",
+							"value": "{{profile_tmp_change_password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/password",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"password"
+					]
+				},
+				"description": "Change user's password with valid password"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Change password [WRONG]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable('profile_tmp_change_password', 'TotoIsNewUsTOTOTOTOTOTOTOOTOTOOTOTOTO');",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null && json.errors !== undefined)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"",
+							"        var usrPassword = json.errors.new_password;",
+							"        var validationErrorPattern = \"validation\";",
+							"        if (usrPassword !== undefined && usrPassword !== null && json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorPattern) != -1)",
+							"        {",
+							"            tests['Validation error, new_password field is not correct.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Validation has passed, it should be not.' + json] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "new_password",
+							"value": "{{profile_tmp_change_password}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/password",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"password"
+					]
+				},
+				"description": "Change user's password with invalid password"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Change email [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d757f107-af80-4353-885d-a8c9da2dbb30",
+						"type": "text/javascript",
+						"exec": [
+							"var newUserMail = Math.random().toString(36).substr(2, 15) + \"@gmail.com\";",
+							"postman.setEnvironmentVariable('profile_tmp_change_email', newUserMail);",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "f77fa081-8deb-4aae-ad5f-ec79daa3c6fc",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.data !== undefined && json.data !== null && (json.errors === null || json.errors === undefined))",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var profile = json.data.profile;",
+							"        if (profile !== undefined && profile !== null && profile.email === environment.profile_tmp_change_email)",
+							"        {",
+							"            postman.setEnvironmentVariable('generated_email_auth', profile.email);",
+							"            tests['Email has changed.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Email has not changed.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{profile_tmp_change_email}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/email",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"email"
+					]
+				},
+				"description": "Change user's email with valid email"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Change email [WRONG] [DUPLICATE]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== undefined && json.errors !== null && (json.data === null || json.data === undefined))",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"",
+							"        var newEmail = json.errors.email;",
+							"        var errorValidationEmailPattern = \"been\";",
+							"        if (newEmail !== undefined && newEmail !== null && newEmail[0].indexOf(errorValidationEmailPattern) != -1)",
+							"        {",
+							"            tests['Validation error, email is duplicated.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Email has changed, it should be not.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{profile_tmp_change_email}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/email",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"email"
+					]
+				},
+				"description": "Change user's email with valid email"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Change email [WRONG]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable('profile_tmp_change_email', 'TotoIsNewUserNam');",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null && json.errors !== undefined)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"",
+							"        var usrEmail = json.errors.email;",
+							"        var validationErrorPattern = \"validation\";",
+							"        if (usrEmail !== undefined && usrEmail !== null && json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorPattern) != -1)",
+							"        {",
+							"            tests['Validation error, email field is not correct.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Validation has passed, it should be not.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load  OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{profile_tmp_change_email}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/email",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"email"
+					]
+				},
+				"description": "Change user's email with invalid email"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Change name [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable('profile_tmp_change_name', 'TotoIsNewUserName');",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var data = json.data;",
+							"        if (data !== undefined && data !== null)",
+							"        {",
+							"            tests['Data is not null'] = true;",
+							"            var profile = json.data.profile;",
+							"            if (profile !== undefined && profile !== null)",
+							"            {",
+							"                tests['Returned profile is not null.'] = true;",
+							"                if (profile.name !== undefined && profile.name !== null && profile.name == environment.profile_tmp_change_name)",
+							"                {",
+							"                    tests['Profile name has been updated.'] = true;",
+							"                }",
+							"                else",
+							"                {",
+							"                    tests['Profile name has not been updated.'] = false;",
+							"                }",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Profile has not been returned.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Data is null.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "{{profile_tmp_change_name}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/name",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"name"
+					]
+				},
+				"description": "Change user's name"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Change bad name [WRONG]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable('profile_tmp_change_name', 'TotoIsNewUserNameIsVeryyyToooLoooooonnnggggg');",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null && json.errors !== undefined)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"",
+							"        var usrname = json.errors.name;",
+							"        if (usrname !== undefined && usrname !== null)",
+							"        {",
+							"            tests['Username is not valid.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Username is valid.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "{{profile_tmp_change_name}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/name",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"name"
+					]
+				},
+				"description": "Change user's name with invalid username"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Change name [WRONG - FIELD]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable('profile_tmp_change_name', 'TotoIsNewUserNameIsVeryyyToooLoooooonnnggggg');",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null && json.errors !== undefined)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"",
+							"        var usrname = json.errors.name;",
+							"        var validationErrorPattern = \"validation error\";",
+							"        if (usrname !== undefined && usrname !== null && json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorPattern) != -1)",
+							"        {",
+							"            ",
+							"            tests['Validation error, name field is not correct.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Validation has passed, it should be not.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "namee",
+							"value": "{{profile_tmp_change_name}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/name",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"name"
+					]
+				},
+				"description": "Change user's name with invalid field name"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Get authors [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var authors = json.data;",
+							"        if (authors !== undefined && authors !== null)",
+							"        {",
+							"            tests['Data is not null'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Data is null.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Add new author [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var newAuthorFirstName = Math.random().toString(36).substr(7);",
+							"var newAuthorLastName = Math.random().toString(36).substr(7);",
+							"",
+							"postman.setEnvironmentVariable(\"author_post_first_name\", newAuthorFirstName);",
+							"postman.setEnvironmentVariable(\"author_post_last_name\", newAuthorLastName);",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var author = json.data;",
+							"        if (author !== undefined)",
+							"        {",
+							"            var lastName = author.last_name;",
+							"            var firstName = author.first_name;",
+							"",
+							"            tests['New author data has been received'] = true;",
+							"            if (firstName == environment.author_post_first_name && lastName == environment.author_post_last_name)",
+							"            {",
+							"                postman.setEnvironmentVariable(\"author_post_id\", author.id);",
+							"                tests['New author information matching with sent information && New author ID : ' + environment.author_post_id] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New author information not matching with sent information'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "first_name",
+							"value": "{{author_post_first_name}}",
+							"type": "text"
+						},
+						{
+							"key": "last_name",
+							"value": "{{author_post_last_name}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Add [DUPLICATE]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4aacb7c0-0302-4d50-9999-f35cb32f8147",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var author = json.data;",
+							"        if (author !== undefined)",
+							"        {",
+							"            var lastName = author.last_name;",
+							"            var firstName = author.first_name;",
+							"",
+							"            tests['New author data has been received'] = true;",
+							"            if (firstName == environment.author_post_first_name && lastName == environment.author_post_last_name)",
+							"            {",
+							"                postman.setEnvironmentVariable(\"author_post_id\", author.id);",
+							"                tests['New author has been added even if it\\'s a duplication : ' + environment.author_post_id] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New author has been added even if it\\'s a duplication : '] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "first_name",
+							"value": "{{author_post_first_name}}",
+							"type": "text"
+						},
+						{
+							"key": "last_name",
+							"value": "{{author_post_last_name}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author"
+					]
+				},
+				"description": "Add duplicate author"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Add [WRONG]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "03115ba6-8c3c-436b-8a4f-d44505fd25dc",
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable(\"author_post_bad_first_name\", \"NewAuthorFirstName\" + \"Tootototototototoot\");",
+							"postman.setEnvironmentVariable(\"author_post_bad_last_name\", \"NewAuthorLastName\" + \"Tototototototototot\");",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3234fdc2-ce7d-42b3-bac9-63b47ae6d38f",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        if (json.errors.first_name !== undefined && json.errors.first_name !== null)",
+							"        {",
+							"            tests['First name and last name have not passed.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Frist name and last name have passed.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "first_name",
+							"value": "{{author_post_bad_first_name}}",
+							"type": "text"
+						},
+						{
+							"key": "last_name",
+							"value": "{{author_post_bad_last_name}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author"
+					]
+				},
+				"description": "Add author with more than 30 characters in the first name and the last name"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Add author with wrong fields name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dca4974f-301c-4eb6-87d9-62649396c3e4",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        if (json.errors.first_name !== undefined && json.errors.first_name !== null)",
+							"        {",
+							"            tests['First name and last name have not passed.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Frist name and last name have passed.'] = false;",
+							"        }",
+							"        var validationErrorTitleSubStr = \"Validation error\";",
+							"        if (json.title !== undefined && json.title !== null && validationErrorTitleSubStr.indexOf(json.title))",
+							"        {",
+							"            tests['Validation errors fields spotted [last_name and first_name].'] = true; ",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Error title is not correct, we expect validation error substr'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "first_name|e",
+							"value": "{{author_post_first_name}}",
+							"type": "text"
+						},
+						{
+							"key": "last_name|e",
+							"value": "{{author_post_last_name}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author"
+					]
+				},
+				"description": "Add new author with wrong fields name (first_name and last_name params)"
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Get [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var books = json.data;",
+							"        if (books !== undefined)",
+							"        {",
+							"            tests['New book data has been received | Nbrs of book : ' + books.length] = true;",
+							"            ",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Add [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "5c7748c1-d1b2-427a-9833-854ad6421628",
+						"type": "text/javascript",
+						"exec": [
+							"var randomIsbn = \"2070518426\";",
+							"var randomBookStatusID = Math.floor((Math.random() * 4) + 0)",
+							"",
+							"postman.setEnvironmentVariable(\"randomisbntoset\", randomIsbn);",
+							"postman.setEnvironmentVariable(\"randomBookStatusID\", randomBookStatusID);",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c2a8a604-ad4b-4a90-b3b1-bca288a5cbb4",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var book = json.data;",
+							"        if (book !== undefined)",
+							"        {",
+							"            var newIsbn = book.isbn;",
+							"            var newStatusID = book.status_id;",
+							"",
+							"            tests['New book data has been received' + newIsbn] = true;",
+							"            if (newIsbn === postman.getEnvironmentVariable(\"randomisbntoset\") && parseInt(newStatusID) === parseInt(postman.getEnvironmentVariable(\"randomBookStatusID\")))",
+							"            {",
+							"                postman.setEnvironmentVariable(\"book_new_book_isbn\", book.isbn);",
+							"                tests['New book information matching with sent information && New book ISBN : ' + environment.book_new_book_isbn] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New book information not matching with sent information'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						},
+						{
+							"key": "status",
+							"value": "{{randomBookStatusID}}",
+							"description": "OPTIONAL if not defined 0 by default.\nPossible status : \nREAD_BOOK_STATE = 0;\npublic const UNREAD_BOOK_STATE = 1;\n  public const WISH_BOOK_STATE = 2;\n  public const BORROW_BOOK_STATE = 3;\n  public const FAVORITE_BOOK_STATE = 4;",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book"
+					]
+				},
+				"description": "Add a valid book"
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Update [STATUS] [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d0d72cf1-bc30-4e46-8e1e-45ad177f31b7",
+						"type": "text/javascript",
+						"exec": [
+							"var randomBookStatusID = Math.floor((Math.random() * 4) + 0)",
+							"",
+							"",
+							"postman.setEnvironmentVariable(\"randomBookStatusID\", randomBookStatusID);",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "70ce0bd3-6fdf-4f95-af64-a838b0347879",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var book = json.data;",
+							"        if (book !== undefined)",
+							"        {",
+							"            var newIsbn = book.isbn;",
+							"            var newStatusID = book.status_id;",
+							"",
+							"            tests['New book data has been received' + postman.getEnvironmentVariable(\"randomBookStatusID\") + ' && env isbn ' + newStatusID] = true;",
+							"            ",
+							"            if (newIsbn === postman.getEnvironmentVariable(\"randomisbntoset\") && parseInt(newStatusID) === parseInt(postman.getEnvironmentVariable(\"randomBookStatusID\")))",
+							"            {",
+							"                postman.setEnvironmentVariable(\"book_new_book_isbn\", book.isbn);",
+							"                tests['New book information matching with sent information && New book ISBN : ' + environment.book_new_book_isbn] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New book information not matching with sent information'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						},
+						{
+							"key": "status",
+							"value": "{{randomBookStatusID}}",
+							"description": "Possible status : \nREAD_BOOK_STATE = 0;\npublic const UNREAD_BOOK_STATE = 1;\n  public const WISH_BOOK_STATE = 2;\n  public const BORROW_BOOK_STATE = 3;\n  public const FAVORITE_BOOK_STATE = 4;",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book"
+					]
+				},
+				"description": "Update a status book"
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Update [STATUS] [VALID] copy",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "d0d72cf1-bc30-4e46-8e1e-45ad177f31b7",
+						"type": "text/javascript",
+						"exec": [
+							"var randomBookStatusID = Math.floor((Math.random() * 4) + 0)",
+							"",
+							"",
+							"postman.setEnvironmentVariable(\"randomBookStatusID\", randomBookStatusID);",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b43201c2-8f65-4e0c-8caf-a205cf4773a0",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var book = json.data;",
+							"        if (book !== undefined)",
+							"        {",
+							"            var newIsbn = book.isbn;",
+							"            var newStatusID = book.status_id;",
+							"",
+							"            tests['New book data has been received' + postman.getEnvironmentVariable(\"randomBookStatusID\") + ' && env isbn ' + newStatusID] = true;",
+							"            ",
+							"            if (newIsbn === postman.getEnvironmentVariable(\"randomisbntoset\") && parseInt(newStatusID) === parseInt(postman.getEnvironmentVariable(\"randomBookStatusID\")))",
+							"            {",
+							"                postman.setEnvironmentVariable(\"book_new_book_isbn\", book.isbn);",
+							"                tests['New book information matching with sent information && New book ISBN : ' + environment.book_new_book_isbn] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New book information not matching with sent information'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						},
+						{
+							"key": "status",
+							"value": "{{randomBookStatusID}}",
+							"description": "Possible status : \nREAD_BOOK_STATE = 0;\npublic const UNREAD_BOOK_STATE = 1;\n  public const WISH_BOOK_STATE = 2;\n  public const BORROW_BOOK_STATE = 3;\n  public const FAVORITE_BOOK_STATE = 4;",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book"
+					]
+				},
+				"description": "Update a status book"
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Add [WRONG] [DUPLICATE]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2ffe3835-2389-4cab-8a37-53ef99de21ae",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"already exist\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Book already exist.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Book should not exist.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book"
+					]
+				},
+				"description": "Add an already existing book for the user"
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Add [WRONG] [FIELD]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"validation error\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Validation error.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['No validation error, it should be.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbnn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book"
+					]
+				},
+				"description": "Add a valid book however field names are wrong."
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Delete [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var book = json.data;",
+							"        if (book !== undefined)",
+							"        {",
+							"            var newIsbn = book.isbn;",
+							"",
+							"            tests['New book data has been received' + newIsbn] = true;",
+							"            if (newIsbn === environment.randomisbntoset)",
+							"            {",
+							"                postman.setEnvironmentVariable(\"book_new_book_isbn\", book.isbn);",
+							"                tests['New book information matching with sent information && New book ISBN : ' + environment.book_new_book_isbn] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New author information not matching with sent information'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						},
+						{
+							"key": "deleted",
+							"value": "yes",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book"
+					]
+				},
+				"description": "Testing if the previously isbn that has been set is  now destroyed."
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Delete [WRONG] [NOT EXIST]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"not exist\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Book already exist.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Book should not exist.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						},
+						{
+							"key": "deleted",
+							"value": "yes",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book"
+					]
+				},
+				"description": "Try to delete an already deleted book"
+			},
+			"response": []
+		},
+		{
+			"name": "Wish - Book [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var books = json.data;",
+							"        if (books !== undefined)",
+							"        {",
+							"            tests['New book data has been received | Nbrs of book : ' + books.length] = true;",
+							"            ",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/wish/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"wish",
+						"book"
+					]
+				},
+				"description": "Get the wish list of books of the user"
+			},
+			"response": []
+		},
+		{
+			"name": "Wish - Book [ADD] [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var book = json.data;",
+							"        if (book !== undefined)",
+							"        {",
+							"            var newIsbn = book.isbn;",
+							"",
+							"            tests['New book data has been received' + newIsbn] = true;",
+							"            if (newIsbn === environment.randomisbntoset)",
+							"            {",
+							"                postman.setEnvironmentVariable(\"book_new_book_isbn\", book.isbn);",
+							"                tests['New book information matching with sent information && New book ISBN : ' + environment.book_new_book_isbn] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New author information not matching with sent information'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/wish/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"wish",
+						"book"
+					]
+				},
+				"description": "Add a valid wish book into the list"
+			},
+			"response": []
+		},
+		{
+			"name": "Wish - Book [VALID][AFTER ADD]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var books = json.data;",
+							"        if (books !== undefined)",
+							"        {",
+							"            var hasFound = false;",
+							"            tests['New book data has been received | Nbrs of book : ' + books.length] = true;",
+							"            for (var i = 0; i < books.length ; i++)",
+							"            {",
+							"                if (books[i].isbn === postman.getEnvironmentVariable('randomisbntoset'))",
+							"                {",
+							"                    hasFound = true;",
+							"                }",
+							"            }",
+							"            if (hasFound)",
+							"            {",
+							"                tests['The previous book has been retrieved.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['The previous book has not been retrieved.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/wish/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"wish",
+						"book"
+					]
+				},
+				"description": "Get the wish list of books of the user"
+			},
+			"response": []
+		},
+		{
+			"name": "Wish - Book [ADD] [WRONG] [DUPLICATE]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"already exist\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Book already exist.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Book should not exist.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/wish/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"wish",
+						"book"
+					]
+				},
+				"description": "Add an invalid wish book into the list"
+			},
+			"response": []
+		},
+		{
+			"name": "Wish - Book [ADD] [WRONG] [FIELD]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"validation error\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Validation error.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['No validation error, it should be.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbnn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/wish/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"wish",
+						"book"
+					]
+				},
+				"description": "Add a valid wish book into the list, field name are wrong"
+			},
+			"response": []
+		},
+		{
+			"name": "Wish - Book [DEL] [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var book = json.data;",
+							"        if (book !== undefined)",
+							"        {",
+							"            var newIsbn = book.isbn;",
+							"",
+							"            tests['New book data has been received' + newIsbn] = true;",
+							"            if (newIsbn === environment.randomisbntoset)",
+							"            {",
+							"                tests['Wish book ISBN : ' + environment.book_new_book_isbn + ' has been deleted.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Wish book has not been deleted.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						},
+						{
+							"key": "deleted",
+							"value": "yes",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/wish/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"wish",
+						"book"
+					]
+				},
+				"description": "Delete a book from wish list of user"
+			},
+			"response": []
+		},
+		{
+			"name": "Wish - Book [DEL] [INVALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"not exist\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Wish book not exist.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Wish book exist, it should not !.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"type": "text"
+						},
+						{
+							"key": "deleted",
+							"value": "yes",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/wish/book",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"wish",
+						"book"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Review - Add [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var newReviewRate = parseInt(Math.round((Math.random() * 5)));",
+							"var newReviewContent = Math.random().toString(36).substring(7) + \" @ content\";",
+							"",
+							"",
+							"postman.setEnvironmentVariable('new_review_rate', newReviewRate);",
+							"postman.setEnvironmentVariable('new_review_content', newReviewContent);",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var review = json.data.review;",
+							"        if (review !== undefined)",
+							"        {",
+							"            var newIsbn = review.isbn;",
+							"",
+							"            tests['New review data has been received ISBN : ' + newIsbn] = true;",
+							"            if (newIsbn === environment.randomisbntoset)",
+							"            {",
+							"                tests['New review information matching with sent information && New review ID : ' + review.id] = true;",
+							"                postman.setEnvironmentVariable('new_review_id', review.id);",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New review information not matching with sent information'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New review data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"description": "MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "content",
+							"value": "{{new_review_content}}",
+							"description": "NOT MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "rate",
+							"value": "{{new_review_rate}}",
+							"description": "NOT MANDATORY",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/review",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review"
+					]
+				},
+				"description": "Add a new review to a book previously created"
+			},
+			"response": []
+		},
+		{
+			"name": "Review - Add [INVALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var newReviewRate = parseInt(Math.round((Math.random() * 5)));",
+							"var newReviewContent = Math.random().toString(36).substring(7) + \" @ content\";",
+							"",
+							"for (var i = 0 ; i < 10 ; i++)",
+							"{",
+							"    newReviewContent = newReviewContent + newReviewContent;",
+							"}",
+							"newReviewRate = 9;",
+							"",
+							"",
+							"postman.setEnvironmentVariable('new_review_rate', newReviewRate);",
+							"postman.setEnvironmentVariable('new_review_content', newReviewContent);",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"validation error\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Adding review with bads parameters works as intended.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Added review with bad params, it should not /!!/'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code success'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}",
+							"description": "MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "content",
+							"value": "{{new_review_content}}",
+							"description": "NOT MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "rate",
+							"value": "{{new_review_rate}}",
+							"description": "NOT MANDATORY",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/review",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review"
+					]
+				},
+				"description": "Add a new review with inexistant ISBN and wrong fields"
+			},
+			"response": []
+		},
+		{
+			"name": "Review - GET [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var reviews = json.data.reviews;",
+							"        if (reviews !== undefined)",
+							"        {",
+							"            tests['New reviews data have been received | Nbrs of reviews : ' + reviews.length] = true;",
+							"            if (reviews.length > 0)",
+							"            {",
+							"                if (reviews[0].id == environment.new_review_id)",
+							"                {",
+							"                    tests['Previous review has been set correctly.'] = true;   ",
+							"                }",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New reviews data have not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/review?isbn={{randomisbntoset}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review"
+					],
+					"query": [
+						{
+							"key": "isbn",
+							"value": "{{randomisbntoset}}"
+						}
+					]
+				},
+				"description": "Get all reviews from given ISBN"
+			},
+			"response": []
+		},
+		{
+			"name": "Review - GET [INVALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"postman.setEnvironmentVariable(\"review_invalid_get_isbn\", \"1902234985\");"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var reviews = json.data.reviews;",
+							"        if (reviews !== undefined)",
+							"        {",
+							"            tests['Reviews data have been received | Nbrs of reviews : ' + reviews.length] = true;",
+							"            if (reviews.length === 0)",
+							"            {",
+							"                ",
+							"                tests['The book has not been reviewed because it does not exist.'] = true;   ",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['The book has been reviewed ! It may not !'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Reviews data have not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/review?isbn={{review_invalid_get_isbn}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review"
+					],
+					"query": [
+						{
+							"key": "isbn",
+							"value": "{{review_invalid_get_isbn}}"
+						}
+					]
+				},
+				"description": "Get all reviews from given ISBN -> it should not work"
+			},
+			"response": []
+		},
+		{
+			"name": "Review - Update [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var newReviewRate = parseInt(Math.round((Math.random() * 5)));",
+							"var newReviewContent = Math.random().toString(36).substring(7) + \" @ content\";",
+							"",
+							"",
+							"postman.setEnvironmentVariable('new_review_rate', newReviewRate);",
+							"postman.setEnvironmentVariable('new_review_content', newReviewContent);"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var review = json.data.review;",
+							"        if (review !== undefined)",
+							"        {",
+							"            if (review.content == environment.new_review_content && review.rate == environment.new_review_rate)",
+							"            {",
+							"                tests['New review data has been updated.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['New review information does not match as intented.'] = false;   ",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New reviews data have not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "content",
+							"value": "{{new_review_content}}",
+							"description": "NOT MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "rate",
+							"value": "{{new_review_rate}}",
+							"description": "NOT MANDATORY",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/review/{{new_review_id}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review",
+						"{{new_review_id}}"
+					]
+				},
+				"description": "Update previous review with new information"
+			},
+			"response": []
+		},
+		{
+			"name": "Review - Update [INVALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var newReviewRate = Math.round((Math.random() * 10)) + 100000;",
+							"var newReviewContent = Math.random().toString(36).substring(7) + \" @ content\";",
+							"",
+							"for (var i = 0 ; i < 10 ; i++)",
+							"{",
+							"    newReviewContent = newReviewContent + newReviewContent;",
+							"}",
+							"newReviewRate = 9;",
+							"",
+							"postman.setEnvironmentVariable('new_review_rate', newReviewRate);",
+							"postman.setEnvironmentVariable('new_review_content', newReviewContent);"
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"validation error\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Update of review impossible.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Review updated, it may not !.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code success'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "content",
+							"value": "{{new_review_content}}",
+							"description": "NOT MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "rate",
+							"value": "{{new_review_rate}}",
+							"description": "NOT MANDATORY",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/review/{{new_review_id}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review",
+						"{{new_review_id}}"
+					]
+				},
+				"description": "Update previous review with new information -> it should not be updated -> parameters are bad"
+			},
+			"response": []
+		},
+		{
+			"name": "Review - Destroy [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null && json.data !== undefined && json.data !== null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"    ",
+							"        var deletedReview = json.data.review;",
+							"        if (deletedReview.id == environment.new_review_id)",
+							"        {",
+							"            tests['Review has been deleted correctly.'] = true;   ",
+							"        }",
+							"        else",
+							"        {",
+							"            tests[\"Review has not been deleted correctly.\"] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "validation",
+							"value": "true",
+							"description": "MANDATORY",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/review/{{new_review_id}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review",
+						"{{new_review_id}}"
+					]
+				},
+				"description": "Destroy previously created review"
+			},
+			"response": []
+		},
+		{
+			"name": "Review - Destroy [INVALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"validation error\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Review book not exist.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Review book exist, it should not !.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code success'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "validation",
+							"value": "false",
+							"description": "MANDATORY",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/review/{{new_review_id}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review",
+						"{{new_review_id}}"
+					]
+				},
+				"description": "Destroy previously created review again -> it should not"
+			},
+			"response": []
+		},
+		{
+			"name": "Review - Destroy [INVALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        var validationErrorTitlePattern = \"not exist\";",
+							"        if (json.title !== null && json.title !== undefined && json.title.indexOf(validationErrorTitlePattern) != -1)",
+							"        {",
+							"            tests['Review book not exist.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Review book exist, it should not !.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code success'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "validation",
+							"value": "true",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/review/{{new_review_id}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"review",
+						"{{new_review_id}}"
+					]
+				},
+				"description": "Destroy previously created review again -> it should not"
+			},
+			"response": []
+		},
+		{
+			"name": "OAuth - Connecting facebook account [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d8fb9059-35b1-4342-8b59-0b2e8785e1ff",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var data = json.data;",
+							"        if (data !== undefined)",
+							"        {",
+							"            var userId = data.user_id;",
+							"            var token = data.token;",
+							"            if (token !== null && userId !== null && userId !== 0)",
+							"            {",
+							"                tests['New token : ' + token + ' && User ID : ' + userId] = true;",
+							"                postman.setEnvironmentVariable('newLogFacebookToken', token);",
+							"                postman.setEnvironmentVariable('newLogFacebookUserId', userId);",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Incoming data are incorrect'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New review data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "token",
+							"value": "EAADLl7HfK50BAPQyxZBSwTTi1vwZBlqtAYYvCZALsRSYUh2GpovEItidEN4kFQYv7I2cIOAPnCO7IqG59tcZCB0tbf7tkp9RedtfHXivjiB6bZBDaFVdTwSFKVqs7l9ifj1oEm1BferLWdpG6a1tO97mdFUoGFGJCdAeeqxTxz8pflQWSNjMs9oI8K17pSsH0xarZAzUfYANEpsycejAERFzWiwFZC1jogZD",
+							"description": "The token from authentication server",
+							"type": "text"
+						},
+						{
+							"key": "provider",
+							"value": "facebook",
+							"description": "The provider name",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/oauth",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"oauth"
+					]
+				},
+				"description": "Oauth connexion (facebook google)"
+			},
+			"response": []
+		},
+		{
+			"name": "OAuth - Connecting google account [VALID] copy",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "token",
+							"value": "4/33cErJz7lm0M3FD0QxLYXYWF56fAFjeEBW3N0llgCMY",
+							"description": "The token from authentication server",
+							"type": "text"
+						},
+						{
+							"key": "provider",
+							"value": "google",
+							"description": "The provider name",
+							"type": "text"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "https://developers.google.com/oauthplayground",
+							"description": "Redirect URI MANDATORY FOR GOOGLE",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/oauth",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"oauth"
+					]
+				},
+				"description": "Oauth connexion (facebook google)"
+			},
+			"response": [
+				{
+					"name": "Connection social",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "token",
+								"value": "MYTOKEN",
+								"description": "Token from authentication server (google or facebook)",
+								"warning": ""
+							},
+							{
+								"key": "provider",
+								"value": "facebookORgoogle",
+								"description": "The provider of the token (google or facebook)",
+								"warning": ""
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{HOST_URL}}api/oauth",
+							"host": [
+								"{{HOST_URL}}api"
+							],
+							"path": [
+								"oauth"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [],
+					"body": ""
+				}
+			]
+		},
+		{
+			"name": "Author - Subscription - ADD [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9939d62d-221d-44da-a72b-746a2f56c825",
+						"type": "text/javascript",
+						"exec": [
+							"var newFirstAuthorSubscriptionId = Math.floor(Math.random() * (50 - 1) + 1);",
+							"var newSecondAuthorSubscriptionId = Math.floor(Math.random() * (50 - 1) + 1);",
+							"",
+							"postman.setEnvironmentVariable('generated_first_author_subscription_id', newFirstAuthorSubscriptionId);",
+							"postman.setEnvironmentVariable('generated_second_author_subscription_id', newSecondAuthorSubscriptionId);",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "299dfaad-a87d-428a-b2a2-e4a89b135b2c",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var validationAddedAuthor = json.data.validation;",
+							"            if (validationAddedAuthor !== null && validationAddedAuthor !== undefined)",
+							"            {",
+							"                tests['Validation OK - Author has been added to subscription.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Author has NOT been added to subscription'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "author_id",
+							"value": "{{generated_first_author_subscription_id}}",
+							"description": "Author id to be followed",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/subscription",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"subscription"
+					]
+				},
+				"description": "Add a new author to the subscription of the user"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Subscription - ADD [VALID][SECOND]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var validationAddedAuthor = json.data.validation;",
+							"            if (validationAddedAuthor !== null && validationAddedAuthor !== undefined)",
+							"            {",
+							"                tests['Validation OK - Author has been added to subscription.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Author has NOT been added to subscription'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "author_id",
+							"value": "{{generated_second_author_subscription_id}}",
+							"description": "Author id to be followed",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/subscription",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"subscription"
+					]
+				},
+				"description": "Add a new author to the subscription of the user"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Subscription - ADD [INVALID][DUPLICATION]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        if (json.data === null || json.data === undefined)",
+							"        {",
+							"            if (json.errors !== null && json.errors !== undefined)",
+							"            {",
+							"                tests['Validation OK - Author has already been added to subscription.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Author has been added to subscription, it should not.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "author_id",
+							"value": "{{generated_first_author_subscription_id}}",
+							"description": "Author id to be followed",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/subscription",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"subscription"
+					]
+				},
+				"description": "Add a new author to the subscription of the user"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Subscription - GET [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var followedAuthors = json.data;",
+							"            var foundNewlyAddedAuthor = false;",
+							"            for (i = 0 ; i < followedAuthors.length && !foundNewlyAddedAuthor ; i++)",
+							"            {",
+							"                if (parseInt(followedAuthors[i].author_id) === parseInt(postman.getEnvironmentVariable(\"generated_first_author_subscription_id\")))",
+							"                {",
+							"                    foundNewlyAddedAuthor = true;",
+							"                }",
+							"            }",
+							"            if (foundNewlyAddedAuthor)",
+							"            {",
+							"                tests['VALIDATION OK - The newly added author has been found.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - The newly added author has not been found.'] = false;",
+							"            }",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/subscription",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"subscription"
+					]
+				},
+				"description": "Get the list of subscribed authors and match with the last added followed author"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Subscription - DEL [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var validationAddedAuthor = json.data.validation;",
+							"            if (validationAddedAuthor !== null && validationAddedAuthor !== undefined)",
+							"            {",
+							"                tests['Validation OK - Author has been removed from subscription.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Author has NOT been removed from subscription.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "author_id",
+							"value": "{{generated_second_author_subscription_id}}",
+							"description": "Author to be unsubscribed",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/subscription",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"subscription"
+					]
+				},
+				"description": "Unsubscribe an author from the user's list"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Subscription - DEL [INVALID][DUPLICATION]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        if (json.data === null || json.data === undefined)",
+							"        {",
+							"            if (json.errors !== null && json.errors !== undefined)",
+							"            {",
+							"                tests['Validation OK - Author has already been removed from subscription.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Author has been removed from subscription, it should not.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "author_id",
+							"value": "{{generated_second_author_subscription_id}}",
+							"description": "Author to be unsubscribed",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/subscription",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"subscription"
+					]
+				},
+				"description": "Unsubscribe an author from the user's list"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Subscription - GET [VALID][CHECK]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var followedAuthors = json.data;",
+							"            var foundNewlyAddedAuthor = false;",
+							"            for (i = 0 ; i < followedAuthors.length && !foundNewlyAddedAuthor ; i++)",
+							"            {",
+							"                if (followedAuthors[i].author_id === parseInt(postman.getEnvironmentVariable(\"generated_second_author_subscription_id\"), 10))",
+							"                {",
+							"                    foundNewlyAddedAuthor = true;",
+							"                }",
+							"            }",
+							"            if (foundNewlyAddedAuthor)",
+							"            {",
+							"                tests['VALIDATION FAIL, the subscription should have been removed.'] = false;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION OK, the subscription has been removed.'] = true;",
+							"            }",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/subscription",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"subscription"
+					]
+				},
+				"description": "Get the list of subscribed authors and match with the last added followed author\nCHECK IF THE LAST UNSUBSCRIPTION HAS BEEN SUCCESSFUL"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Novels - ADD [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var isbn = Math.floor(Math.random() * (1300000000000 - 1900000000000 + 1)) + 1300000000000;",
+							"var maxDuration = Math.floor(Math.random() * (50 - 2) + 2);",
+							"var authorId = Math.floor(Math.random() * (50 - 2 ) + 2);",
+							"var title = 'Title : ' + Math.random().toString(30).substring(10);",
+							"",
+							"",
+							"postman.setEnvironmentVariable(\"generated_author_novel_isbn\", isbn);",
+							"postman.setEnvironmentVariable(\"generated_author_novel_max_duration\", maxDuration);",
+							"postman.setEnvironmentVariable(\"generated_author_novel_title\", title);",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var addedNovelId = json.data.id;",
+							"            if (addedNovelId !== null && addedNovelId !== undefined)",
+							"            {",
+							"                postman.setEnvironmentVariable(\"author_novel_added_novel_id\", addedNovelId)",
+							"                tests['Validation OK - Novel has been added.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Novel has not been added.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "author_id",
+							"value": "{{generated_first_author_subscription_id}}",
+							"description": "Author ID  MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "isbn",
+							"value": "{{generated_author_novel_isbn}}",
+							"description": "ISBN of the book  MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "duration",
+							"value": "{{generated_author_novel_max_duration}}",
+							"description": "Duration of the news for the novels (in hour)  MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "title",
+							"value": "{{generated_author_novel_title}}",
+							"description": "The title of the news for the novels  MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "content",
+							"value": "",
+							"description": "Content (extra) OPTIONNAL",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/novels",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"novels"
+					]
+				},
+				"description": "Add a new novel to the author's novels"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Novels - ADD [VALID][EXPIRED]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var isbn = Math.floor(Math.random() * (1300000000000 - 1900000000000 + 1)) + 1300000000000;",
+							"var title = 'Title : ' + Math.random().toString(30).substring(10);",
+							"",
+							"",
+							"postman.setEnvironmentVariable(\"generated_author_expired_novel_isbn\", isbn);",
+							"postman.setEnvironmentVariable(\"generated_author_expired_novel_title\", title);",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var addedNovelId = json.data.id;",
+							"            if (addedNovelId !== null && addedNovelId !== undefined)",
+							"            {",
+							"                postman.setEnvironmentVariable(\"author_added_novel_expired_id\", addedNovelId) //To check if the new novel (expired) is not sent to user",
+							"                tests['Validation OK - Novel has been added.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Novel has not been added.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "author_id",
+							"value": "{{generated_first_author_subscription_id}}",
+							"description": "Author ID  MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "isbn",
+							"value": "{{generated_author_expired_novel_isbn}}",
+							"description": "ISBN of the book  MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "duration",
+							"value": "0",
+							"description": "Duration of the news for the novels (in hour)  MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "title",
+							"value": "{{generated_author_expired_novel_title}}",
+							"description": "The title of the news for the novels  MANDATORY",
+							"type": "text"
+						},
+						{
+							"key": "content",
+							"value": "",
+							"description": "Content (extra) OPTIONNAL",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/novels",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"novels"
+					]
+				},
+				"description": "Add a new novel to the author's novels but a new EXPIRED one."
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Novels - GET [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var authorsNewNovels = json.data;",
+							"            var foundNewAddedNovel = false;",
+							"            for (i = 0 ; i < authorsNewNovels.length && !foundNewAddedNovel ; i++)",
+							"            {",
+							"                if (authorsNewNovels[i].isbn == postman.getEnvironmentVariable(\"generated_author_novel_isbn\")",
+							"                && authorsNewNovels[i].author_id == postman.getEnvironmentVariable(\"generated_first_author_subscription_id\"))",
+							"                {",
+							"                    foundNewAddedNovel = true;",
+							"                }",
+							"            }",
+							"            if (foundNewAddedNovel)",
+							"            {",
+							"                tests['VALIDATION OK - The newly novels added to author\\' list has been found.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - The newly novels added to author\\' list has NOT been found.'] = false;",
+							"            }",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/novels?author_id=",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"novels"
+					],
+					"query": [
+						{
+							"key": "author_id",
+							"value": ""
+						}
+					]
+				},
+				"description": "Initially fetch all novels of all authors HOWEVER\nif you specify the author id in the URL field you will get all novels belongs to the author"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Notification - Novels GET [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dc555660-433a-4c5c-92d4-77babfb7319f",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var authorsNewNovelsNotifs = json.data;",
+							"            var foundNewAddedNovel = false;",
+							"            var foundNewExpiredNovel = false;",
+							"            for (i = 0 ; i < authorsNewNovelsNotifs.length && !foundNewAddedNovel ; i++)",
+							"            {",
+							"                if (parseInt(postman.getEnvironmentVariable('author_novel_added_novel_id', 10)) == authorsNewNovelsNotifs[i].author_novels_id)",
+							"                {",
+							"                    foundNewAddedNovel = true;",
+							"                }",
+							"                if (parseInt(postman.getEnvironmentVariable('author_added_novel_expired_id', 10)) == authorsNewNovelsNotifs[i].author_novels_id)",
+							"                {",
+							"                    foundNewExpiredNovel = true;",
+							"                }",
+							"            }",
+							"            if (foundNewAddedNovel)",
+							"            {",
+							"                tests['VALIDATION OK - The newly novels added to author\\' list has been found.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - The newly novels added to author\\' list has NOT been found.'] = false;",
+							"            }",
+							"            if (authorsNewNovelsNotifs.length !== 0)",
+							"            {",
+							"                if (foundNewExpiredNovel)",
+							"                {",
+							"                    tests['VALIDATION FAIL - The newly expired novel has been found, it should not'] = false;",
+							"                }",
+							"                else",
+							"                {",
+							"                    tests['VALIDATION OK - The newly expired novel has been not found.'] = true;",
+							"                }                ",
+							"            }",
+							"            ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/novels/notifications",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"novels",
+						"notifications"
+					]
+				},
+				"description": "Get all new notifications of new novels made by all followed authors.\nOnce notifications fetched, they will be stored in database and never been notified again, so take care to handle correctly these data /!\\."
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Notification - Novels GET [VALID][CHECK ALREADY NOTIFIED]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            if (json.data.length === 0)",
+							"            {",
+							"                tests['VALIDATION OK - No more notifications.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - There are still few notifications, it should not'] = false;",
+							"            }",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/novels/notifications",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"novels",
+						"notifications"
+					]
+				},
+				"description": "Get all new notifications of new novels made by all followed authors.\nOnce notifications fetched, they will be stored in database and never been notified again, so take care to handle correctly these data /!\\.\n\nHere the server should return a data object WITHOUT any elements because they have already been notified for the user (cf. previous request)."
+			},
+			"response": []
+		},
+		{
+			"name": "Authors - Novels - DEL [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var novelDeleted = json.data.id;",
+							"            if (novelDeleted !== null && novelDeleted !== undefined)",
+							"            {",
+							"                tests['Validation OK - Novel of author has been removed from news.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Novel has NOT been removed from news.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "id",
+							"value": "{{author_novel_added_novel_id}}",
+							"description": "ID of the novel that will be deleted",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/novels",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"novels"
+					]
+				},
+				"description": "Delete a novel from a author novels list"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Novels - GET [VALID][CHECK DELETE]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var authorsNewNovels = json.data;",
+							"            var foundNewAddedNovel = false;",
+							"            for (i = 0 ; i < authorsNewNovels.length && !foundNewAddedNovel ; i++)",
+							"            {",
+							"                if (authorsNewNovels[i].isbn === parseInt(postman.getEnvironmentVariable(\"generated_author_novel_isbn\"), 10)",
+							"                && authorsNewNovels[i].author_id === parseInt(postman.getEnvironmentVariable(\"generated_first_author_subscription_id\", 10)))",
+							"                {",
+							"                    foundNewAddedNovel = true;",
+							"                }",
+							"            }",
+							"            if (!foundNewAddedNovel)",
+							"            {",
+							"                tests['VALIDATION OK - The newly novels added to author\\' list has NOT been found.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - The newly novels added to author\\' list has been found.'] = false;",
+							"            }",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/author/novels?author_id=",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author",
+						"novels"
+					],
+					"query": [
+						{
+							"key": "author_id",
+							"value": ""
+						}
+					]
+				},
+				"description": "Initially fetch all novels of all authors HOWEVER\nif you specify the author id in the URL field you will get all novels belongs to the author"
+			},
+			"response": []
+		},
+		{
+			"name": "Friend - GET [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c03e7e54-ee5b-4911-9dd9-c4de034c667d",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var friends = json.data;",
+							"            if (friends.length === 0 || friends.length === undefined)",
+							"            {",
+							"                tests['VALIDATION OK - 0 friends has been found.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - Friends has been found, should not.'] = false;",
+							"            }",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/friend/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"friend",
+						""
+					]
+				},
+				"description": "Get friend list"
+			},
+			"response": []
+		},
+		{
+			"name": "Friend - ADD [VALID]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "599a4e4e-65dd-40b7-80d8-14e190019da5",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "b7610acc-24b2-4c85-bfb0-45f5609c5639",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var friendID = json.data.id;",
+							"            if (friendID !== null && friendID !== undefined)",
+							"            {",
+							"                postman.setEnvironmentVariable(\"friend_new_added_id\", friendID)",
+							"                tests['Validation OK - Friend has been added.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Friend has not been added.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "friend_id",
+							"value": "{{newLogFacebookUserId}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/friend/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"friend",
+						""
+					]
+				},
+				"description": "Add new friend"
+			},
+			"response": []
+		},
+		{
+			"name": "Friend - GET [VALID][DUPLICATE]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f96eaaad-c1f0-4582-b590-328ddbbebde8",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var friends = json.data;",
+							"            var friendFound = false;",
+							"            for (i = 0 ; i < friends.length && !friendFound ; i++)",
+							"            {",
+							"                if (parseInt(friends[i].friend_id) === parseInt(postman.getEnvironmentVariable(\"friend_new_added_id\")))",
+							"                {",
+							"                    friendFound = true;",
+							"                }",
+							"            }",
+							"            if (friendFound)",
+							"            {",
+							"                tests['VALIDATION OK - The newly added friend has been found.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - The newly added friend has NOT been found.'] = false;",
+							"            }",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/friend/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"friend",
+						""
+					]
+				},
+				"description": "Get friend list and check if the previous added friend is set"
+			},
+			"response": []
+		},
+		{
+			"name": "Friend - ADD [VALID][DUPLICATE]",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "599a4e4e-65dd-40b7-80d8-14e190019da5",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "d08ac5c5-90fd-4968-8eb4-f4750aad34ce",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 404)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.title !== null && json.title !== undefined)",
+							"        {",
+							"            if (json.title !== undefined && json.title.indexOf('Already friend') != -1)",
+							"            {",
+							"                tests['Validation OK - Friend is duplicated, abort.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Friend should be duplicated, it should fail.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "friend_id",
+							"value": "{{newLogFacebookUserId}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/friend/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"friend",
+						""
+					]
+				},
+				"description": "Try to add twice time the same friend ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Friend - DELETE [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c9fb9a23-5df8-4f39-8fc7-270c4bbe226c",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var successDelete = json.data.success;",
+							"            if (successDelete !== null && successDelete !== undefined && successDelete === true)",
+							"            {",
+							"                tests['Validation OK - Friend has been deleted.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Friend has not been deleted.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "friend_id",
+							"value": "{{friend_new_added_id}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/friend/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"friend",
+						""
+					]
+				},
+				"description": "Delete a friend"
+			},
+			"response": []
+		},
+		{
+			"name": "Friend - DELETE [VALID][DUPLICATE DELETE]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b2a23877-731b-4f97-86c3-b393ee0d4055",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var successDelete = json.data.success;",
+							"            if (successDelete !== null && successDelete !== undefined && successDelete === false)",
+							"            {",
+							"                tests['Validation OK - Friend has NOT been deleted.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Friend has been deleted, it should not exist.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "friend_id",
+							"value": "{{friend_new_added_id}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/friend/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"friend",
+						""
+					]
+				},
+				"description": "Delete a friend that has been already deleted"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - POST Search [VALID] ",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5b09dd32-cc36-4754-b928-dad3d1ea3d05",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var profiles = json.data;",
+							"            var profileFound = false;",
+							"            for (i = 0 ; i < profiles.length && !profileFound ; i++)",
+							"            {",
+							"                if (profiles[i].id === parseInt(postman.getEnvironmentVariable(\"newLogFacebookUserId\")))",
+							"                {",
+							"                    profileFound = true;",
+							"                }",
+							"            }",
+							"            if (profileFound)",
+							"            {",
+							"                tests['VALIDATION OK - The profile has been found.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - The profile has NOT been found.'] = false;",
+							"            }",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "keywords_search",
+							"value": "Joly",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile/search",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile",
+						"search"
+					]
+				},
+				"description": "Search for a profile, can be found be email or nickname"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth - ResetPassword TOKEN POST [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "251a2891-7ed8-43c0-a98e-b3e017d00dd0",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var success = json.data.success;",
+							"            if (success !== null && success !== undefined && success === \"true\")",
+							"            {",
+							"                tests['Validation OK - The new password has been sent by email.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - THe new password has not been sent.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "{{generated_email_auth}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/resetpassword",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"resetpassword"
+					]
+				},
+				"description": "Get a new token sent via mail to change the password in the future, please take a look at the resetpassword GET request"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth - ResetPassword TOKEN POST [INVALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "08cd38c6-5bce-4f0b-8b96-c7889fc93f82",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var success = json.data.success;",
+							"            if (success !== null && success !== undefined && success === \"false\")",
+							"            {",
+							"                tests['Validation OK - The new password has NOT been sent by email.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - THe new password has been sent.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "jolynico88@sfr.fr",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/resetpassword",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"resetpassword"
+					]
+				},
+				"description": "Reset the password and send a new one to the user"
+			},
+			"response": []
+		},
+		{
+			"name": "Auth - ResetPassword TOKEN POST [VALID][SOCIAL AUTH]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0e787a61-c5a2-4cac-8d74-e221748c5f0d",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        var data = json.data;",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (data !== null && data !== undefined)",
+							"        {",
+							"            var success = json.data.success;",
+							"            if (success !== null && success !== undefined && success === \"false\")",
+							"            {",
+							"                tests['Validation OK - The new password has NOT been sent by email.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - THe new password has been sent.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "eiiiieiiiiieiiiieeee@fkkkkkddddd.fr",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/resetpassword",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"resetpassword"
+					]
+				},
+				"description": "Try to reset the password of a user that have been logged with a social network account."
+			},
+			"response": []
+		},
+		{
+			"name": "Auth - ResetPassword GET [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "25773ed9-5379-4efd-b334-885f57ba9e8e",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined)",
+							"    {",
+							"        ",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "email",
+							"value": "eiiiieiiiiieiiiieeee@fkkkkkddddd.fr",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/resetpassword/MjxDsNI",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"resetpassword",
+						"MjxDsNI"
+					]
+				},
+				"description": "Send the token to get a new password via mail"
+			},
+			"response": []
+		},
+		{
+			"name": "Wish - External View [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ae7df93b-07fc-43d7-831e-b6bd9760e522",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var books = json.data;",
+							"        if (books !== undefined)",
+							"        {",
+							"            if (books.length > 0)",
+							"            {",
+							"                tests['VALIDATION OK - Wishlist is not empty.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIL - Wishlist is empty.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['New author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/wish/book/{{generated_user_id}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"wish",
+						"book",
+						"{{generated_user_id}}"
+					]
+				},
+				"description": "Get the wish list of others users"
+			},
+			"response": []
+		},
+		{
+			"name": "Amazon Link GET - [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "85902724-3988-4674-adc4-78e68cdbc4ea",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        if (json.data !== null && json.data !== undefined)",
+							"        {",
+							"            var amazonURL = json.data.url;",
+							"            if (amazonURL !== null && amazonURL !== undefined && amazonURL.length !== 0)",
+							"            {",
+							"                tests['Validation OK - Got amazon Link : ' + amazonURL] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Validation FAIL - Did not get amazon link.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Server has not sent any data'] = false;   ",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors have been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "keywords_search",
+							"value": "Harry potter",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/buy/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"buy",
+						""
+					]
+				},
+				"description": "Get an amazon link according of what the user is trying to search, the keywords search fields accept string and also ISBN"
+			},
+			"response": []
+		},
+		{
+			"name": "Suggestions - GET [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4496485a-a730-47c6-8268-b39006d6d43b",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        var suggestions = json.data.latest_suggestions;",
+							"        if (suggestions !== undefined && suggestions !== null && suggestions.length !== 0)",
+							"        {",
+							"            tests['VALIDATION OK - Suggestions are not empty.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['VALIDATION FAIL - Suggestions are empty.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}",
+							"",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "force_build",
+							"value": "true",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/suggestion/",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"suggestion",
+						""
+					]
+				},
+				"description": "Get the suggestions (ISBN) based of the latest books of the user, there are also others kind of information like user's frinds suggestions and user's friends latest books"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Delete author [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var author = json.data;",
+							"        if (author !== undefined)",
+							"        {",
+							"            var lastName = author.last_name;",
+							"            var firstName = author.first_name;",
+							"",
+							"            tests['Deleted author data has been received'] = true;",
+							"            if (firstName == environment.author_post_first_name && lastName == environment.author_post_last_name && author.id == environment.author_post_id)",
+							"            {",
+							"                tests['Deleted author information matching with sent information && Deleted author ID : ' + environment.author_post_id] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['Deleted author information not matching with sent information'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Deleted author data has not been received.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "id",
+							"value": "{{author_post_id}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author"
+					]
+				},
+				"description": "Delete an author from previous add"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Delete already deleted author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        var authorNotExistTitlePattern = \"not exist\";",
+							"        if (json.title !== null && json.title !== undefined && authorNotExistTitlePattern.indexOf(json.title))",
+							"        {",
+							"            tests['Author not exist. It cannot be deleted.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Author exist, it should not be.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "id",
+							"value": "{{author_post_id}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author"
+					]
+				},
+				"description": "Delete an author with already deleted ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Author - Delete bad id author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 401)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors !== null)",
+							"    {",
+							"        tests['Json Object loaded && errors has been found'] = true;",
+							"        ",
+							"        if (json.errors.id !== undefined && json.errors.id !== null)",
+							"        {",
+							"            tests['Id is not valid.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Id seems to be valid.'] = false;",
+							"        }",
+							"        ",
+							"        var validationErrorTitlePattern = \"validation error\";",
+							"        if (json.title !== null && json.title !== undefined && validationErrorTitlePattern.indexOf(json.title))",
+							"        {",
+							"            tests['Field validations errors.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['Field validation errors.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has not been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure'] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "id",
+							"value": "IdNotWork",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/author",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"author"
+					]
+				},
+				"description": "Delete an author with incorrect ID"
+			},
+			"response": []
+		},
+		{
+			"name": "Book - Search - [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "0241b30c-c287-41fc-b2ca-aa5cd885a4fa",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"        var details = json.data;",
+							"        if (details !== undefined && details !== null)",
+							"        {",
+							"            var detailsHasBeenFound = false;",
+							"            for (i = 0 ; i < details.length ; i++)",
+							"            {",
+							"                var bookTitle = details[i].book_title;",
+							"                var bookPictureUrl = details[i].book_picture_url;",
+							"                var bookAmazonUrl = details[i].book_amazon_url;",
+							"                if (bookTitle !== undefined && bookTitle !== null && bookTitle.indexOf(postman.getEnvironmentVariable('titleToTestForSearch')) !== -1)",
+							"                {",
+							"                    detailsHasBeenFound = true;",
+							"                }",
+							"            }",
+							"            if (detailsHasBeenFound)",
+							"            {",
+							"                tests['VALIDATION OK - Suggestions are not empty.'] = true;",
+							"            }",
+							"            else",
+							"            {",
+							"                tests['VALIDATION FAIl - Details are not really equivalent.'] = false;",
+							"            }",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['VALIDATION FAIL - Details are empty.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}",
+							"",
+							""
+						]
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "fe20a933-bc06-46ea-96d3-e39563c202a0",
+						"type": "text/javascript",
+						"exec": [
+							"var isbnToTestForSearch = \"9782915732009\";",
+							"postman.setEnvironmentVariable(\"isbnToTestForSearch\", isbnToTestForSearch);",
+							"postman.setEnvironmentVariable(\"titleToTestForSearch\", \"Petit Nicolas\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{HOST_URL}}api/book/search/{{isbnToTestForSearch}}",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"book",
+						"search",
+						"{{isbnToTestForSearch}}"
+					]
+				},
+				"description": "Search for details of a book, the keywords fields can be isbn, asin, everything you want which is logical"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Delete [VALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 200 || responseCode.code === 201)",
+							"{",
+							"    tests[\"Http code success\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.errors === null && json.data !== undefined && json.data !== null)",
+							"    {",
+							"        tests['Json Object loaded && NO errors has been found'] = true;",
+							"",
+							"        var deleted = json.data.deleted;",
+							"        if (deleted !== undefined && deleted !== null && deleted === \"true\")",
+							"        {",
+							"            tests['User deleted.'] = true;",
+							"        }",
+							"        else",
+							"        {",
+							"            tests['User not deleted.'] = false;",
+							"        }",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['Json Object failed to load OR errors has been found.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "delete",
+							"value": "yes",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile"
+					]
+				},
+				"description": "Delete the profile/user from the app"
+			},
+			"response": []
+		},
+		{
+			"name": "Profile - Delete [INVALID]",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6c7a6ba5-cfa2-429e-8f0a-023bf2326f48",
+						"type": "text/javascript",
+						"exec": [
+							"if (responseCode.code === 400 || responseCode.code === 404)",
+							"{",
+							"    tests[\"Http code failed\"] = true;",
+							"    ",
+							"    var json = JSON.parse(responseBody);",
+							"    if (json !== undefined && json.error !== null)",
+							"    {",
+							"        tests['User not deleted.'] = true;",
+							"    }",
+							"    else",
+							"    {",
+							"        tests['User should be not alive in server side !.'] = false;",
+							"    }",
+							"}",
+							"else",
+							"{",
+							"    tests['Http code failure' . responseBody] = false;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "password",
+							"value": "{{generated_password_auth}}",
+							"type": "text"
+						},
+						{
+							"key": "delete",
+							"value": "yes",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{HOST_URL}}api/profile",
+					"host": [
+						"{{HOST_URL}}api"
+					],
+					"path": [
+						"profile"
+					]
+				},
+				"description": "Delete already deleted user"
+			},
+			"response": []
+		}
+	]
+}
