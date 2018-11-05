@@ -12,7 +12,7 @@ Gérer sa bibliothèque papier et la mettre à jour :
 - Possibilité de créer une liste de souhait afin que vos contacts sachent quels livres vous offrir  
 
 L'aide à l'achat : 
-- Suggestions de nouveaux livres en se basant sur les acquis et les liste de souhaits
+- Suggestions de nouveaux livres en se basant sur les acquis et les listes de souhaits
 - Onglet "Découvertes" indiquant des livres pouvant vous plaire selon vos livres déjà possédés 
 - Affiche les avis d'autres lecteurs lors du scan d'un livre (avis renseignés via l'application ou récupérés sur internet) 
 - Note "le degré d'affinité" que vous avez au livre en fonction de votre bibliothèque déjà renseignée 
